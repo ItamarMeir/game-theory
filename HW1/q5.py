@@ -153,13 +153,25 @@ class Engine:
         rounds = list(range(self.T))
 
         # import matplotlib lazily to avoid module-level import issues in some editors
-        import matplotlib.pyplot as plt
+        try:
+            import importlib
+            plt = importlib.import_module("matplotlib.pyplot")
+        except Exception:
+            print("matplotlib is not available; skipping plotting.")
+            return
 
         fig, ax = plt.subplots(figsize=(8, 4))
 
-        # plot both players on the same axes with different colors and legend
-        ax.plot(rounds, avg_u1, label="P1 avg utility", color="C0")
-        ax.plot(rounds, avg_u2, label="P2 avg utility", color="C1")
+        # include final average values in the legend labels instead of annotating the plot
+        label1 = "P1 avg utility"
+        label2 = "P2 avg utility"
+        if avg_u1:
+            label1 = f"P1 avg utility (final {avg_u1[-1]:.2f})"
+        if avg_u2:
+            label2 = f"P2 avg utility (final {avg_u2[-1]:.2f})"
+
+        ax.plot(rounds, avg_u1, label=label1, color="C0")
+        ax.plot(rounds, avg_u2, label=label2, color="C1")
         ax.set_xlabel("Round t")
         ax.set_ylabel("Avg utility")
         ax.grid(True)
@@ -167,7 +179,6 @@ class Engine:
 
         fig.suptitle(f"Best-response dynamics in {self.game} {title_suffix}")
         plt.tight_layout()
-        plt.show()
         plt.show()
 
 
